@@ -83,6 +83,13 @@ export default function Particles(props) {
           <p>{`${key}: ${value}`}</p>
         ))}
       </div>
+      <div className="flex flex-col gap-1 whitespace-pre-line px-4 py-2 text-xs">
+        <span>
+          *데이터는 실시간 관측된 자료이며 측정소 현지 사정이나 예기치 않은 문제
+          등으로 오류가 있을 수 있습니다
+        </span>
+        <span>데이터 출처: 대기오염정보 (한국환경공단)</span>
+      </div>
     </div>
   );
 }

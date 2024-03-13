@@ -28,7 +28,11 @@ export const findPathByName = (menuItems, names) => {
 
 export default function RootLayout() {
   const { toggleTheme, isDarkTheme } = useTheme();
-  const [menuOn, setMenuOn] = useState(false);
+  const [menuOn, setMenuOn] = useState({
+    Layer1: false,
+    Layer2: false,
+    Layer3: false,
+  });
   const [currentRoute, setCurrentRoute] = useState([]);
   const [shadowMouse, setShadowMouse] = useState(false);
 
@@ -53,7 +57,7 @@ export default function RootLayout() {
         setMousePos,
         shadowMouse,
         setShadowMouse,
-        lang
+        lang,
       }}
     >
       <div
@@ -62,7 +66,15 @@ export default function RootLayout() {
         <Navigator />
         <div
           className="mt-10 flex w-full flex-col bg-white py-10 sm:px-0 lg:mt-20 lg:h-full"
-          onClick={() => (menuOn ? setMenuOn(false) : null)}
+          onClick={() =>
+            menuOn.Layer1
+              ? setMenuOn({
+                  Layer1: false,
+                  Layer2: false,
+                  Layer3: false,
+                })
+              : null
+          }
         >
           <ScrollRestoration />
           <Outlet />

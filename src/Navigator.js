@@ -22,9 +22,7 @@ export default function Navigator(props) {
     toggleTheme,
     isDarkTheme,
   } = useContext(QueryContext);
-  const [subMenuOn, setSubMenuOn] = useState(false);
   const [subMenuElem, setSubMenuElem] = useState([]);
-  const [subSubMenuOn, setSubSubMenuOn] = useState(false);
   const [subSubMenuElem, setSubSubMenuElem] = useState([]);
   const [activeItem, setActiveItem] = useState([null, null, null]);
   const [showNav, setShowNav] = useState(true);
@@ -56,17 +54,20 @@ export default function Navigator(props) {
   const controlNavbar = () => {
     if (window.scrollY > 30) {
       setShowNav(false);
-      setMenuOn(false);
+      setMenuOn({ ...menuOn, Layer1: false });
     } else {
       setShowNav(true);
     }
   };
 
   const handleToggleMenu = () => {
-    setMenuOn(!menuOn);
-    if (menuOn) {
-      setSubMenuOn(!menuOn);
-      setSubSubMenuOn(!menuOn);
+    setMenuOn({ ...menuOn, Layer1: !menuOn.Layer1 });
+    if (menuOn.Layer1) {
+      setMenuOn({
+        Layer1: !menuOn.Layer1,
+        Layer2: !menuOn.Layer1,
+        Layer3: !menuOn.Layer1,
+      });
       setSubMenuElem([]);
       setSubSubMenuElem([]);
     }
@@ -80,9 +81,9 @@ export default function Navigator(props) {
     // Resets the appropriate submenu based on the level and updates the active item state
     if (level === "first") {
       setSubMenuElem([]);
-      setSubMenuOn(false);
+      setMenuOn({ ...menuOn, Layer2: false });
       setTimeout(() => {
-        setSubMenuOn(true);
+        setMenuOn({ ...menuOn, Layer2: true });
       }, 200);
       const item = findItemByName(menuItem, itemName);
       // Resetting active item for all levels and setting the first level
@@ -93,9 +94,9 @@ export default function Navigator(props) {
       setSubSubMenuElem([]);
       // Always reset sub-submenu when selecting a new first-level item
     } else if (level === "second") {
-      setSubSubMenuOn(false);
+      setMenuOn({ ...menuOn, Layer3: false });
       setTimeout(() => {
-        setSubSubMenuOn(true);
+        setMenuOn({ ...menuOn, Layer3: true });
       }, 200);
       const parentItem = findItemByName(menuItem, activeItem[0]);
       const subItem = findItemByName(parentItem.sub, itemName);
@@ -112,15 +113,17 @@ export default function Navigator(props) {
   useEffect(() => {
     setCurrentRoute(location.pathname.slice(1).split("/"));
     console.log(location);
+    setMenuOn({
+      Layer1: false,
+      Layer2: false,
+      Layer3: false,
+    });
     setSubMenuElem([]);
     setSubSubMenuElem([]);
-    setMenuOn(false);
-    setSubMenuOn(false);
-    setSubSubMenuOn(false);
   }, [location]);
 
   useEffect(() => {
-    if (!menuOn) return;
+    if (!menuOn.Layer1) return;
     springRefBorderLeft.start({
       from: { height: "0" },
       to: { height: "100%" },
@@ -130,25 +133,25 @@ export default function Navigator(props) {
         easing: (x) => (x === 0 ? 0 : Math.pow(2, 10 * x - 10)),
       },
     });
-  }, [menuOn]);
+  }, [menuOn.Layer1]);
 
   useEffect(() => {
     const startSpring = (num) => springBMValue.start(num);
-    if (!subMenuOn) {
+    if (!menuOn.Layer2) {
       startSpring(0);
     } else {
       startSpring(250);
     }
-  }, [subMenuOn]);
+  }, [menuOn.Layer2]);
 
   useEffect(() => {
     const startSpring = (num) => springBRValue.start(num);
-    if (!subSubMenuOn) {
-      startSpring(0);
-    } else {
+    if (menuOn.Layer3) {
       startSpring(250);
+    } else {
+      startSpring(0);
     }
-  }, [subSubMenuOn]);
+  }, [menuOn.Layer3]);
 
   useEffect(() => {
     window.addEventListener("scroll", controlNavbar);
@@ -159,7 +162,7 @@ export default function Navigator(props) {
 
   return (
     <div
-      className={`${isDarkTheme ? "bg-black" : "bg-white"} ${menuOn ? "h-0" : "h-fit"} fixed left-0 top-0 z-40 w-full select-none border-b-[1px] border-solid shadow-b transition-hcol`}
+      className={`${isDarkTheme ? "bg-black" : "bg-white"} ${menuOn.Layer1 ? "h-0" : "h-fit"} fixed left-0 top-0 z-40 w-full select-none border-b-[1px] border-solid shadow-b transition-hcol`}
     >
       <div className="relative z-20 flex h-fit w-full flex-col">
         <div
@@ -208,7 +211,7 @@ export default function Navigator(props) {
         <div
           id="nav-sub"
           className={`${isDarkTheme ? "bg-black" : "bg-white"} relative z-10 flex w-full flex-row flex-wrap items-start justify-start transition-transform duration-500 ease-out lg:pl-20 ${
-            menuOn
+            menuOn.Layer1
               ? `shadow-dim sm:h-full md:h-full lg:h-[400px]`
               : `sm:h-0 sm:-translate-y-96 md:h-0 md:-translate-y-96 lg:h-0 lg:-translate-y-96`
           }`}
@@ -229,9 +232,11 @@ export default function Navigator(props) {
                   onClick={() => handleMenuExtend("first", item.name)}
                   onTouchStart={() => handleMenuExtend("first", item.name)}
                   style={{
-                    transitionDelay: menuOn ? `${i * 50 + 350}ms` : "0ms",
+                    transitionDelay: menuOn.Layer1
+                      ? `${i * 50 + 350}ms`
+                      : "0ms",
                   }}
-                  className={`${menuOn ? "opacity-1 duration-200" : "opacity-0 duration-0"} ${activeItem[0] === item.name ? "bg-wpblue-500 text-white" : "bg-white"} relative my-2 inline-flex w-full cursor-pointer items-end justify-between rounded-sm border-b border-solid border-gray-800 p-3 text-dark transition-opacity ease-in lg:my-0 lg:hover:brightness-110`}
+                  className={`${menuOn.Layer1 ? "opacity-1 duration-200" : "opacity-0 duration-0"} ${activeItem[0] === item.name ? "bg-wpblue-500 text-white" : "bg-white"} relative my-2 inline-flex w-full cursor-pointer items-end justify-between rounded-sm border-b border-solid border-gray-800 p-3 text-dark transition-opacity ease-in lg:my-0 lg:hover:brightness-110`}
                 >
                   <p>{item.name}</p>
                   <MdKeyboardDoubleArrowRight className="h-4 w-4" />
@@ -240,12 +245,12 @@ export default function Navigator(props) {
                 <NavLink
                   key={item.name}
                   to={`${i === 0 ? "/" : item.path}`}
-                  onClick={() => handleMenuExtend("first", item.name)}
-                  onTouchStart={() => handleMenuExtend("first", item.name)}
                   style={{
-                    transitionDelay: menuOn ? `${i * 50 + 350}ms` : "0ms",
+                    transitionDelay: menuOn.Layer1
+                      ? `${i * 50 + 350}ms`
+                      : "0ms",
                   }}
-                  className={`${menuOn ? "opacity-1 duration-200" : "opacity-0 duration-0"} ${activeItem[0] === item.name ? "bg-wpblue-500 text-white" : "bg-white"} relative my-2 inline-flex w-full items-end justify-between rounded-sm border-b border-solid border-gray-800 p-3 text-dark transition-opacity ease-in lg:my-0 lg:hover:brightness-110`}
+                  className={`${menuOn.Layer1 ? "opacity-1 duration-200" : "opacity-0 duration-0"} ${activeItem[0] === item.name ? "bg-wpblue-500 text-white" : "bg-white"} relative my-2 inline-flex w-full items-end justify-between rounded-sm border-b border-solid border-gray-800 p-3 text-dark transition-opacity ease-in lg:my-0 lg:hover:brightness-110`}
                 >
                   <p>{item.name}</p>
                 </NavLink>
@@ -266,9 +271,9 @@ export default function Navigator(props) {
                   onClick={() => handleMenuExtend("second", item.name)}
                   onTouchStart={() => handleMenuExtend("second", item.name)}
                   style={{
-                    transitionDelay: subMenuOn ? `${i * 50}ms` : "0ms",
+                    transitionDelay: menuOn.Layer2 ? `${i * 50}ms` : "0ms",
                   }}
-                  className={`${subMenuOn ? "opacity-1 duration-200" : "opacity-0 duration-0"} ${activeItem[1] === item.name ? "bg-wpblue-500 text-white" : "bg-white"} relative my-2 inline-flex w-full cursor-pointer items-end justify-between rounded-sm border-b border-solid border-gray-800 p-3 text-dark transition-opacity ease-in lg:my-0 lg:hover:brightness-110`}
+                  className={`${menuOn.Layer2 ? "opacity-1 duration-200" : "opacity-0 duration-0"} ${activeItem[1] === item.name ? "bg-wpblue-500 text-white" : "bg-white"} relative my-2 inline-flex w-full cursor-pointer items-end justify-between rounded-sm border-b border-solid border-gray-800 p-3 text-dark transition-opacity ease-in lg:my-0 lg:hover:brightness-110`}
                 >
                   <p>{item.name}</p>
                   <MdKeyboardDoubleArrowRight className="h-4 w-4" />
@@ -277,12 +282,10 @@ export default function Navigator(props) {
                 <NavLink
                   key={item.name}
                   to={item.path}
-                  onClick={() => handleMenuExtend("second", item.name)}
-                  onTouchStart={() => handleMenuExtend("second", item.name)}
                   style={{
-                    transitionDelay: subMenuOn ? `${i * 50}ms` : "0ms",
+                    transitionDelay: menuOn.Layer2 ? `${i * 50}ms` : "0ms",
                   }}
-                  className={`${subMenuOn ? "opacity-1 duration-200" : "opacity-0 duration-0"} ${activeItem[1] === item.name ? "bg-wpblue-500 text-white" : "bg-white"} relative my-2 inline-flex w-full items-end justify-between rounded-sm border-b border-solid border-gray-800 p-3 text-dark transition-opacity ease-in lg:my-0 lg:hover:brightness-110`}
+                  className={`${menuOn.Layer2 ? "opacity-1 duration-200" : "opacity-0 duration-0"} ${activeItem[1] === item.name ? "bg-wpblue-500 text-white" : "bg-white"} relative my-2 inline-flex w-full items-end justify-between rounded-sm border-b border-solid border-gray-800 p-3 text-dark transition-opacity ease-in lg:my-0 lg:hover:brightness-110`}
                 >
                   <p>{item.name}</p>
                 </NavLink>
@@ -300,12 +303,10 @@ export default function Navigator(props) {
             {subSubMenuElem.map((item, i) => (
               <NavLink
                 to={item.path}
-                onClick={() => handleMenuExtend("third", item.name)}
-                onTouchStart={() => handleMenuExtend("third", item.name)}
                 style={{
-                  transitionDelay: subSubMenuOn ? `${i * 50}ms` : "0ms",
+                  transitionDelay: menuOn.Layer3 ? `${i * 50}ms` : "0ms",
                 }}
-                className={`${subSubMenuOn ? "opacity-1 duration-200" : "opacity-0 duration-0"} ${activeItem[2] === item.name ? "bg-wpblue-500 text-white" : "bg-white"} relative my-2 inline-flex w-full items-end justify-between rounded-sm border-b border-solid border-gray-800 p-3 text-dark transition-opacity ease-in lg:my-0 lg:hover:brightness-110`}
+                className={`${menuOn.Layer3 ? "opacity-1 duration-200" : "opacity-0 duration-0"} ${activeItem[2] === item.name ? "bg-wpblue-500 text-white" : "bg-white"} relative my-2 inline-flex w-full items-end justify-between rounded-sm border-b border-solid border-gray-800 p-3 text-dark transition-opacity ease-in lg:my-0 lg:hover:brightness-110`}
               >
                 {!item.sub && <p>{item.name}</p>}
                 {item.sub && (
