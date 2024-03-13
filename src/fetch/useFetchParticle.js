@@ -7,7 +7,7 @@ export default function useFetchParticle(city, isLocated) {
   const [isDusted, setIsDusted] = useState(false);
   const [allItems, setAllItems] = useState([]);
 
-  const serviceKey = process.env.REACT_APP_WEATHER_KEY;
+  const serviceKey = process.env.REACT_APP_WEATHER_FLORIAN;
 
   const cityDustUrl =
     "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty";
