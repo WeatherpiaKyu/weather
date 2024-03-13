@@ -4,7 +4,7 @@ import LaosProject from "./LaosProject";
 import { QueryContext } from "../layout/RootLayout";
 
 export default function ProjectGlobal(props) {
-  const { shadowMouse, setShadowMouse } = useContext(QueryContext);
+  const { shadowMouse, setShadowMouse, lang } = useContext(QueryContext);
 
   const projectDetail = [<LaosProject />, <KyrgyzProject />];
 
