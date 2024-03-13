@@ -10,7 +10,7 @@ export default function useFetchParticle(city, isLocated) {
   const serviceKey = process.env.REACT_APP_WEATHER_FLORIAN;
 
   const cityDustUrl =
-    "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty";
+    "https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty";
 
   useEffect(() => {
     const abortController = new AbortController();

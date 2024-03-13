@@ -21,7 +21,7 @@ jobs:
           npm run-script build
         env:
           CI: ""
-          REACT_APP_WEATHER_KEY: ${{ secrets.REACT_APP_WEATHER_KEY }}
+          REACT_APP_WEATHER_KEY: ${{ secrets.REACT_APP_WEATHER_FLORIAN }}
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
