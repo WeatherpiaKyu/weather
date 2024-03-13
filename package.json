@@ -1,6 +1,7 @@
 {
   "name": "weather",
   "version": "0.1.0",
+  "homepage": "https://weatherpiakyu.github.io/weather",
   "private": true,
   "dependencies": {
     "@react-spring/web": "^9.7.3",
